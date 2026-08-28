@@ -1,0 +1,13 @@
+.env
+.DS_Store
+node_modules
+dist
+coverage
+.vscode
+.idea
+*.log
+*.tsbuildinfo
+.venv
+data
+*.pth
+input.txt
