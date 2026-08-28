@@ -20,7 +20,7 @@ if has_kernel(hf_kernel):
 flashAttn.flash_attn_func()
 ```
 
-# References
+## References
 
 不同版本的论文在以下GitHub repository中有链接。
 

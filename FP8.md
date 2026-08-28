@@ -76,7 +76,7 @@ def backward(ctx, grad_output):
     return grad_input, grad_weight
 ```
 
-# References
+## References
 
 - [Training Deep Neural Networks with 8-bit Floating Point Numbers](https://arxiv.org/abs/1812.08011)
 - [FP8 Formats for Deep Learning](https://arxiv.org/abs/2209.05433)
