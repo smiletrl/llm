@@ -61,7 +61,7 @@ def backward(ctx, grad_output):
 
     # === 矩阵乘法 2: grad_weight = grad_output.T @ input ===
     # Shapes: [N, B] @ [B, K] -> [N, K]
-    # go_fp8 [B, N] 在内存中是行连续， go.T = [N, B] 转置后，就变成了列连续，需要加contiguous()，在内存中重新分配为行连续，适配_scaled_mm()的第一个参数要求。
+    # go_fp8 [B, N] 在内存中是行连续， go.T = [N, B] 转置后，就变成了列连续，需要加contiguous()，在内存中重新分配，变为行连续，适配_scaled_mm()的第一个参数要求。
     go_T = go_fp8.t().contiguous()  # [N, B] row-major
     in_col = _to_col_major(in_fp8)    # [B, K] column-major
     grad_weight = torch._scaled_mm(
