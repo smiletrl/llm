@@ -153,7 +153,7 @@ y = flash_attn.flash_attn_func(q, k, v, ...)
 
 - [苏剑林. (Mar. 23, 2021). 《Transformer升级之路：2、博采众长的旋转式位置编码 》](https://spaces.ac.cn/archives/8265)
 - [RoFormer: Enhanced Transformer with Rotary Position Embedding](https://arxiv.org/abs/2104.09864)
-- [Hugging Face Rotary Embedding](https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py)
+- [Hugging Face Rotary Pos Embedding](https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py)
 
 ```python
 
