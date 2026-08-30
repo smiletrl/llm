@@ -67,20 +67,19 @@ $[[X_1, X_{n/2}], [X_2, X_{n/2+1}], \dots, [X_{n/2-1}, X_n]]$。这是参照 Hug
  
 - $t$ 表示位置的步长（stride），之所以写 $t$， 主要是nanochat中写的 $t$（应该是借鉴了RNN/LSTM中的写法）。实际或许写 $p$ 更合理些，因为这代表一个token 在sequence序列中的位置。我们得到的 $\theta_t$ ， 就是不同位置 $m, n$ 的token的旋转角度 $\theta_m , \theta_n$。
 
-参考**前置基础几何**中的内容，求$Q/K$的旋转后每一对二维特征的新语义编码
+参考**前置基础几何**中的角度旋转公式：
 
 $$y_1 = x_1 \cos\theta - x_2 \sin\theta$$
 
 $$y_2 = x_1 \sin\theta + x_2 \cos\theta$$
 
-注意力机制的核心矩阵乘法：**计算旋转后的 $\tilde{q}_m$ 和 $\tilde{k}_n$ 的点积**。
-
-把它们代入展开：
+对应 $Q/K$ 的旋转后每一对二维特征的新语义编码（注意，nanochat中实际是对角度 $-\theta$ 旋转）：
 
 * $\tilde{q}_m = (x_1 \cos\theta_m + x_2 \sin\theta_m, \ -x_1 \sin\theta_m + x_2 \cos\theta_m)$
 * $\tilde{k}_n = (k_1 \cos\theta_n + k_2 \sin\theta_n, \ -k_1 \sin\theta_n + k_2 \cos\theta_n)$
 
-计算这两个二维特征的点积（第一项乘第一项 + 第二项乘第二项）：
+
+应用注意力机制的核心矩阵乘法：**计算旋转后的 $\tilde{q}_m$ 和 $\tilde{k}_n$ 的点积**（第一项乘第一项 + 第二项乘第二项）：
 
 
 $$\tilde{q}_m \cdot \tilde{k}_n = (x_1 \cos\theta_m + x_2 \sin\theta_m)(k_1 \cos\theta_n + k_2 \sin\theta_n) + (-x_1 \sin\theta_m + x_2 \cos\theta_m)(-k_1 \sin\theta_n + k_2 \cos\theta_n)$$
@@ -95,7 +94,7 @@ $$\sin\theta_m\cos\theta_n - \cos\theta_m\sin\theta_n = \mathbf{\sin(\theta_m - 
 
 $$\tilde{q}_m \cdot \tilde{k}_n = (x_1 k_1 + x_2 k_2) \mathbf{\cos((m - n)\theta)} + (x_2 k_1 - x_1 k_2) \mathbf{\sin((m - n)\theta)}$$
 
-这个结果有一个非常好的性质， $(x_1 k_1 + x_2 k_2)$ 正好是原始Q*K没有旋转前的点积运算结果。这说明旋转后的点积，保留了原始语义编码的点积，又加上了相对位置差 $(m - n)$ 的性质。
+这个结果有一个非常好的性质， $(x_1 k_1 + x_2 k_2)$ 正好是原始 $Q*K$ 没有旋转前的点积运算结果。这说明旋转后的点积，保留了原始语义编码的点积，又加上了相对位置差 $(m - n)$ 的性质。
 
 **注：以上推导基于实数域的简单计算，实际推导参考论文中的复数域计算。*
 
