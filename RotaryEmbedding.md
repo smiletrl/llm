@@ -42,7 +42,21 @@ $$y_2 = x_1 \sin\theta + x_2 \cos\theta$$
 得到**二维旋转矩阵**形式就是：
 
 
-$$\begin{bmatrix} y_1 \\ y_2 \end{bmatrix} = \begin{bmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}$$
+$$
+\begin{bmatrix} 
+y_1 \\ 
+y_2 
+\end{bmatrix} 
+= 
+\begin{bmatrix} 
+\cos\theta & -\sin\theta \\ 
+\sin\theta & \cos\theta 
+\end{bmatrix} 
+\begin{bmatrix} 
+x_1 \\ 
+x_2 
+\end{bmatrix}
+$$
 
 
 ## 旋转核心思想
