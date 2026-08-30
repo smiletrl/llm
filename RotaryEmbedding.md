@@ -75,7 +75,7 @@ $$y_2 = x_1 \sin\theta + x_2 \cos\theta$$
 
 注意力机制的核心矩阵乘法：**计算旋转后的 $\tilde{q}_m$ 和 $\tilde{k}_n$ 的点积**。
 
-把它们代入展开(注意：nanochat中假定旋转的是 $-\theta$, 前面有个负号 )：
+把它们代入展开：
 
 * $\tilde{q}_m = (x_1 \cos\theta_m + x_2 \sin\theta_m, \ -x_1 \sin\theta_m + x_2 \cos\theta_m)$
 * $\tilde{k}_n = (k_1 \cos\theta_n + k_2 \sin\theta_n, \ -k_1 \sin\theta_n + k_2 \cos\theta_n)$
@@ -153,3 +153,39 @@ y = flash_attn.flash_attn_func(q, k, v, ...)
 
 - [苏剑林. (Mar. 23, 2021). 《Transformer升级之路：2、博采众长的旋转式位置编码 》](https://spaces.ac.cn/archives/8265)
 - [RoFormer: Enhanced Transformer with Rotary Position Embedding](https://arxiv.org/abs/2104.09864)
+- [Hugging Face Rotary Embedding](https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py)
+
+```python
+
+def rotate_half(x):
+    """Rotates half the hidden dims of the input."""
+    x1 = x[..., : x.shape[-1] // 2]
+    x2 = x[..., x.shape[-1] // 2 :]
+    return torch.cat((-x2, x1), dim=-1)
+
+
+@use_kernel_forward_from_hub("rotary_pos_emb")
+def apply_rotary_pos_emb(q, k, cos, sin, unsqueeze_dim=1):
+    """Applies Rotary Position Embedding to the query and key tensors.
+
+    Args:
+        q (`torch.Tensor`): The query tensor.
+        k (`torch.Tensor`): The key tensor.
+        cos (`torch.Tensor`): The cosine part of the rotary embedding.
+        sin (`torch.Tensor`): The sine part of the rotary embedding.
+        unsqueeze_dim (`int`, *optional*, defaults to 1):
+            The 'unsqueeze_dim' argument specifies the dimension along which to unsqueeze cos[position_ids] and
+            sin[position_ids] so that they can be properly broadcasted to the dimensions of q and k. For example, note
+            that cos[position_ids] and sin[position_ids] have the shape [batch_size, seq_len, head_dim]. Then, if q and
+            k have the shape [batch_size, heads, seq_len, head_dim], then setting unsqueeze_dim=1 makes
+            cos[position_ids] and sin[position_ids] broadcastable to the shapes of q and k. Similarly, if q and k have
+            the shape [batch_size, seq_len, heads, head_dim], then set unsqueeze_dim=2.
+    Returns:
+        `tuple(torch.Tensor)` comprising of the query and key tensors rotated using the Rotary Position Embedding.
+    """
+    cos = cos.unsqueeze(unsqueeze_dim)
+    sin = sin.unsqueeze(unsqueeze_dim)
+    q_embed = (q * cos) + (rotate_half(q) * sin)
+    k_embed = (k * cos) + (rotate_half(k) * sin)
+    return q_embed, k_embed
+```
