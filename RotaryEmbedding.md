@@ -33,7 +33,7 @@ $$y_1 = (r \cos\alpha) \cos\theta - (r \sin\alpha) \sin\theta$$
 
 $$y_2 = (r \sin\alpha) \cos\theta + (r \cos\alpha) \sin\theta$$
 
-在开始时我们已经定义了 $x_1 = r \cos\alpha$，$x_2 = r \sin\alpha$。把它们直接替换进去：
+在开始时我们已经定义了 $x_1 = r \cos\alpha$，$x_2 = r \sin\alpha$ 。把它们直接替换进去：
 
 
 $$y_1 = x_1 \cos\theta - x_2 \sin\theta$$
@@ -46,16 +46,16 @@ $$y_2 = x_1 \sin\theta + x_2 \cos\theta$$
 $$\begin{bmatrix} y_1 \\ y_2 \end{bmatrix} = \begin{bmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}$$
 
 
-# 旋转核心思想
+## 旋转核心思想
 
 - 原始Google论文的实现方式是需要额外新建一个绝对位置编码（position embedding）, 这个位置编码跟token本身语义的编码相加，然后一起进入神经网络学习。
-- 旋转编码的设计非常巧妙，是在计算注意力的时候 $Q * K$, 提前将Q跟K的语义编码按照不同token所在的位置，旋转一个角度。比如位置m的token 旋转 $\theta_m$, 位置n的token旋转 $\theta_n$ 。然后点积运算 
+- 旋转编码的设计非常巧妙，是在计算注意力的时候 $Q * K$, 提前将 $Q$ 跟 $K$ 的语义编码按照不同token所在的位置，旋转一个角度。比如位置 $m$ 的token 旋转 $\theta_m$, 位置 $n$ 的token旋转 $\theta_n$ 。然后点积运算 
 
  $$\vec{q} \cdot \vec{k} = \vert{}\vec{q}\vert{} \vert{}\vec{k}\vert{} \cos(\theta_m - \theta_n)$$
 
 - 相当于在计算注意力的时候，因为分别根据各自的位置旋转了特定的角度，导致旋转后的向量做点积的时候，自动算进去了它们之间的旋转夹角 $(\theta_m - \theta_n)$，而这个夹角就代表了它们的位置差异。
 
-- 角度的计算规则，以 $Q$ 为例。 它的最后一个维度，拆分为两两一对向量，比如 [X1, X2, X3 .... Xn], 被拆成 n/2 对，[[X1, Xn/2], [X2, Xn/2+1], ...[Xn/2-1, Xn]]。然后每对向量的旋转有不同的频率。
+- 角度的计算规则，以 $Q$ 为例。 它的最后一个维度，拆分为两两一对向量，比如 $[X1, X2, X3 .... Xn]$ , 被拆成 $n/2$ 对，$[[X1, Xn/2], [X2, Xn/2+1], ...[Xn/2-1, Xn]]$ 。这是参照Meta LLaMA风格，也是目前通用的标准。在[苏剑林的原始RoFormer论文](https://arxiv.org/abs/2104.09864)中，采用的是相邻维度拆分，也就是$[[X1,X2], [X3, X4], ....]$ 。拆分后每对向量的旋转有不同的频率。
 
  $$\theta_i = \text{base}^{-2i/d}$$
 
@@ -87,24 +87,23 @@ $$\tilde{q}_m \cdot \tilde{k}_n = (x_1 \cos\theta_m + x_2 \sin\theta_m)(k_1 \cos
 
 把上面的式子完全乘开并合并同类项，所有带 $\theta_m$ 和 $\theta_n$ 的单项都会利用三角恒等式组合成：
 
-
 $$\cos\theta_m\cos\theta_n + \sin\theta_m\sin\theta_n = \mathbf{\cos(\theta_m - \theta_n)}$$
 
 $$\sin\theta_m\cos\theta_n - \cos\theta_m\sin\theta_n = \mathbf{\sin(\theta_m - \theta_n)}$$
 
 最终化简出的结果为：
 
-
 $$\tilde{q}_m \cdot \tilde{k}_n = (x_1 k_1 + x_2 k_2) \mathbf{\cos((m - n)\theta)} + (x_2 k_1 - x_1 k_2) \mathbf{\sin((m - n)\theta)}$$
 
-这个结果有一个非常好的性质， $(x_1 k_1 + x_2 k_2)$ 正好是原始Q*K没有旋转前的点积运算结果。这说明旋转后的点积，依然保留了原始语义编码的点积结果。
+这个结果有一个非常好的性质， $(x_1 k_1 + x_2 k_2)$ 正好是原始Q*K没有旋转前的点积运算结果。这说明旋转后的点积，保留了原始语义编码的点积，又加上了相对位置差 $(m - n)$ 的性质。
 
-# 实现步骤
+**注：以上推导基于实数领域的简单计算，实际参考论文中的实数复数计算。*
+
+## 实现步骤
 
 Nanochat中的步骤，主要在文件`nanochat/gpt.py`中
 
-
-在 `gpt.py` 内部，专门预先计算角度的函数 `_precompute_rotary_embeddings`：
+对于每个sequence而言，它的内部每个token的位置，token内部二维特征拆分后的每对旋转频率都是一样的，我们可以提前将旋转角度的正弦/余弦值计算出来。 在 `gpt.py` 内部，专门预先计算角度的函数 `_precompute_rotary_embeddings`：
 
 ```python
     def _precompute_rotary_embeddings(self, seq_len, head_dim, base=100000, device=None):
@@ -125,11 +124,11 @@ Nanochat中的步骤，主要在文件`nanochat/gpt.py`中
         return cos, sin
 ```
 
-计算一个张量的旋转编码
+在对每一个sequance进行旋转计算的时候，用不同sequance里token的原始语义编码拆分后的二维特征对，乘以旋转角度的正弦余弦值，计算一个张量的旋转编码：
 
 ```python
 def apply_rotary_emb(x, cos, sin):
-    # 这里旋转角度加了一个负号。
+    # 这里旋转角度加了一个负号。跟上文推导的公式稍微有个符号差异。
     assert x.ndim == 4  # 多头注意力
     d = x.shape[3] // 2
     x1, x2 = x[..., :d], x[..., d:] # 最后一维分为两批
@@ -138,7 +137,7 @@ def apply_rotary_emb(x, cos, sin):
     return torch.cat([y1, y2], 3)
 ```
 
-分别旋转q, k
+分别旋转 $q, k$
 
 ```python
 q, k = apply_rotary_emb(q, cos, sin), apply_rotary_emb(k, cos, sin)
