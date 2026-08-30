@@ -32,7 +32,7 @@ $$y_1 = (r \cos\alpha) \cos\theta - (r \sin\alpha) \sin\theta$$
 
 $$y_2 = (r \sin\alpha) \cos\theta + (r \cos\alpha) \sin\theta$$
 
-在开始时我们已经定义了 $x_1 = r \cos\alpha$，$x_2 = r \sin\alpha$ 。把它们直接替换进去：
+在开始时我们已经定义了 $x_1 = r \cos\alpha$ ，$x_2 = r \sin\alpha$ 。把它们直接替换进去：
 
 
 $$y_1 = x_1 \cos\theta - x_2 \sin\theta$$
