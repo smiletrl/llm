@@ -46,7 +46,8 @@ $$\begin{bmatrix} y_1 \cr y_2 \end{bmatrix} = \begin{bmatrix} \cos\theta & -\sin
 
 ## 旋转核心思想
 
-- 原始Google论文的实现方式是需要额外新建一个绝对位置编码（position embedding）, 这个位置编码跟token本身语义的编码相加，然后一起进入神经网络学习。
+- 原始 Google 论文采用可训练的绝对位置编码，直接与词嵌入相加，然后一起进入神经网络学习。
+
 - 旋转编码的设计非常巧妙，是在计算注意力的时候 $Q * K$, 提前将 $Q$ 跟 $K$ 的语义编码按照不同token所在的位置，旋转一个角度。比如位置 $m$ 的token 旋转 $\theta_m$, 位置 $n$ 的token旋转 $\theta_n$ 。然后点积运算 
 
  $$\vec{q} \cdot \vec{k} = \vert{}\vec{q}\vert{} \vert{}\vec{k}\vert{} \cos(\theta_m - \theta_n)$$
@@ -54,7 +55,7 @@ $$\begin{bmatrix} y_1 \cr y_2 \end{bmatrix} = \begin{bmatrix} \cos\theta & -\sin
 - 相当于在计算注意力的时候，因为分别根据各自的位置旋转了特定的角度，导致旋转后的向量做点积的时候，自动算进去了它们之间的旋转夹角 $(\theta_m - \theta_n)$，而这个夹角就代表了它们的位置差异。
 
 - 角度的计算规则，以 $Q$ 为例。它的最后一个维度，拆分为两两一对向量，比如 $[X_1, X_2, X_3, \dots, X_n]$，被拆成 $n / 2$ 对，
-$[[X_1, X_{n/2}], [X_2, X_{n/2+1}], \dots, [X_{n/2-1}, X_n]]$。这是参照 Meta LLaMA 风格，也是目前通用的标准。在[苏剑林的原始 RoFormer 论文](https://arxiv.org/abs/2104.09864)中，采用的是相邻维度拆分，也就是 $[[X_1, X_2], [X_3, X_4], \dots]$。拆分后每对向量的旋转有不同的频率。
+$[[X_1, X_{n/2}], [X_2, X_{n/2+1}], \dots, [X_{n/2-1}, X_n]]$。这是参照 Hugging Face Transformers 库中 [LLaMA](https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py) 的实现风格（ $rotate\_half()$ ，出于计算效率考虑），也是目前大模型工程代码库的通用标准。在[苏剑林的原始 RoFormer 论文](https://arxiv.org/abs/2104.09864)中，采用的是相邻维度拆分，也就是 $[[X_1, X_2], [X_3, X_4], \dots]$。拆分后每对向量的旋转有不同的频率。
 
  $$\theta_i = \text{base}^{-2i/d}$$
 
@@ -64,7 +65,7 @@ $[[X_1, X_{n/2}], [X_2, X_{n/2+1}], \dots, [X_{n/2-1}, X_n]]$。这是参照 Met
 
  $$\theta_t = t * \theta_i $$
  
-- $t$ 表示位置的步长（stride），之所以写 $t$， 主要是nanochat中写的 $t$（应该是借鉴了RNN/LSTM中的写法）。实际应该写 $p$ 或许更合理些，因为这代表一个token 在sequence序列中的位置。我们得到的 $\theta_t$ ， 就是不同位置 $m, n$ 的token的旋转角度 $\theta_m , \theta_n$。
+- $t$ 表示位置的步长（stride），之所以写 $t$， 主要是nanochat中写的 $t$（应该是借鉴了RNN/LSTM中的写法）。实际或许写 $p$ 更合理些，因为这代表一个token 在sequence序列中的位置。我们得到的 $\theta_t$ ， 就是不同位置 $m, n$ 的token的旋转角度 $\theta_m , \theta_n$。
 
 参考**前置基础几何**中的内容，求$Q/K$的旋转后每一对二维特征的新语义编码
 
@@ -127,10 +128,10 @@ $$\tilde{q}_m \cdot \tilde{k}_n = (x_1 k_1 + x_2 k_2) \mathbf{\cos((m - n)\theta
 
 ```python
 def apply_rotary_emb(x, cos, sin):
-    # 这里旋转角度加了一个负号。跟上文推导的公式稍微有个符号差异。
     assert x.ndim == 4  # 多头注意力
     d = x.shape[3] // 2
     x1, x2 = x[..., :d], x[..., d:] # 最后一维分为两批
+    # 注意：由于 nanochat 在底层实现时对旋转角度取了负号（即旋转 -θ），因此下方代码中的 y1 公式与上文标准推导的符号相反，这是完全等价的。
     y1 = x1 * cos + x2 * sin # 旋转特征组
     y2 = x1 * (-sin) + x2 * cos
     return torch.cat([y1, y2], 3)
