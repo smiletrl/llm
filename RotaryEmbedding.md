@@ -41,8 +41,7 @@ $$y_2 = x_1 \sin\theta + x_2 \cos\theta$$
 
 得到**二维旋转矩阵**形式就是：
 
-
-$$\begin{bmatrix} y_1 \\ y_2 \end{bmatrix} = \begin{bmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}$$
+$$\begin{bmatrix} y_1 \cr y_2 \end{bmatrix} = \begin{bmatrix} \cos\theta & -\sin\theta \cr \sin\theta & \cos\theta \end{bmatrix} \begin{bmatrix} x_1 \cr x_2 \end{bmatrix}$$
 
 
 ## 旋转核心思想
@@ -65,9 +64,9 @@ $[[X_1, X_{n/2}], [X_2, X_{n/2+1}], \dots, [X_{n/2-1}, X_n]]$。这是参照 Met
 
  $$\theta_t = t * \theta_i $$
  
-- $t$ 表示位置的步长（stride），之所以写 $t$， 主要是nanochat中写的t（应该是借鉴了RNN/LSTM中的写法）。实际应该写 $p$ 或许更合理些，因为这代表一个token 在sequence序列中的位置。我们得到的 $\theta_t$ ， 就是不同位置m, n的token的旋转角度 $\theta_m , \theta_n$。
+- $t$ 表示位置的步长（stride），之所以写 $t$， 主要是nanochat中写的 $t$（应该是借鉴了RNN/LSTM中的写法）。实际应该写 $p$ 或许更合理些，因为这代表一个token 在sequence序列中的位置。我们得到的 $\theta_t$ ， 就是不同位置 $m, n$ 的token的旋转角度 $\theta_m , \theta_n$。
 
-参考**前置基础几何**中的内容，求Q/K的旋转后每一对二维特征的新语义编码
+参考**前置基础几何**中的内容，求$Q/K$的旋转后每一对二维特征的新语义编码
 
 $$y_1 = x_1 \cos\theta - x_2 \sin\theta$$
 
@@ -115,7 +114,7 @@ $$\tilde{q}_m \cdot \tilde{k}_n = (x_1 k_1 + x_2 k_2) \mathbf{\cos((m - n)\theta
         inv_freq = 1.0 / (base ** (channel_range / head_dim))
         # 位置索引
         t = torch.arange(seq_len, dtype=torch.float32, device=device)
-        # 计算每个二特征对的旋转角度
+        # 计算不同token位置下，每个二特征对的旋转角度。
         freqs = torch.outer(t, inv_freq)
         cos, sin = freqs.cos(), freqs.sin()
         cos, sin = cos.to(COMPUTE_DTYPE), sin.to(COMPUTE_DTYPE)
