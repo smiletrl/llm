@@ -55,7 +55,7 @@ $$\begin{bmatrix} y_1 \cr y_2 \end{bmatrix} = \begin{bmatrix} \cos\theta & -\sin
 - 相当于在计算注意力的时候，因为分别根据各自的位置旋转了特定的角度，导致旋转后的向量做点积的时候，自动算进去了它们之间的旋转夹角 $(\theta_m - \theta_n)$，而这个夹角就代表了它们的位置差异。
 
 - 角度的计算规则，以 $Q$ 为例。它的最后一个维度，拆分为两两一对向量，比如 $[X_1, X_2, X_3, \dots, X_n]$，被拆成 $n / 2$ 对，
-$[[X_1, X_{n/2}], [X_2, X_{n/2+1}], \dots, [X_{n/2-1}, X_n]]$。这是参照 Hugging Face Transformers 库中 [LLaMA](https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py) 的实现风格（ $rotate\_half()$ ，出于计算效率考虑），也是目前大模型工程代码库的通用标准。在[苏剑林的原始 RoFormer 论文](https://arxiv.org/abs/2104.09864)中，采用的是相邻维度拆分，也就是 $[[X_1, X_2], [X_3, X_4], \dots]$。拆分后每对向量的旋转有不同的频率。
+$[[X_1, X_{n/2}], [X_2, X_{n/2+1}], \dots, [X_{n/2-1}, X_n]]$。这是参照 Hugging Face Transformers 库中 [LLaMA](https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py) 的实现风格（出于计算效率考虑），也是目前大模型工程代码库的通用标准。在[苏剑林的原始 RoFormer 论文](https://arxiv.org/abs/2104.09864)中，采用的是相邻维度拆分，也就是 $[[X_1, X_2], [X_3, X_4], \dots]$。拆分后每对向量的旋转有不同的频率。
 
  $$\theta_i = \text{base}^{-2i/d}$$
 
