@@ -1,6 +1,6 @@
 # KV cache
 
-在做大模型注意力计算时，因为 $K$ 都需要做 [位置编码（Rotary Position Embedding）](./RotaryEmbedding.md)计算， 我们可以将公式中的 $K/V$ 数据缓存起来，提高计算效率。
+在做大模型注意力计算时，我们可以将公式中的 $K/V$ 数据缓存起来，提高计算效率。
 
 - 场景一：预测序列 sequence 的下一个token
 
