@@ -28,22 +28,25 @@
 状态：✅ 已有正文 · 🚧 草稿 · ⏳ 未写
 
 | # | 章节 | 状态 | 上游主要文件 |
-|---|---|---|---|
+|:---|:---|:---:|:---|
+| **第 0 阶** | **全局视角** | | |
 | 0 | 仓库地图：一次训练到能聊天经过哪些阶段 | ⏳ | `runs/speedrun.sh`，`scripts/` |
+| **第 1 阶** | **数据与模型骨架 (Model)** | | |
 | 1 | Tokenizer | ⏳ | `scripts/tok_train.py`，`scripts/tok_eval.py`，`nanochat/tokenizer.py` |
 | 2 | 模型结构 | ⏳ | `nanochat/gpt.py` |
 | 3 | [旋转位置编码 RoPE](RotaryEmbedding.md) | ✅ | `nanochat/gpt.py` |
-| 4 | [FlashAttention](FlashAttention.md) | 🚧 | `nanochat/flash_attention.py` |
-| 5 | [KV Cache 与推理引擎](KVCache.md) | ✅ | `nanochat/engine.py`，`nanochat/gpt.py` |
-| 6 | 数据与预训练循环 | ⏳ | `nanochat/dataset.py`，`nanochat/dataloader.py`，`scripts/base_train.py` |
-| 7 | 优化器、精度与 checkpoint | ⏳ | `nanochat/optim.py`，`nanochat/common.py`，`nanochat/checkpoint_manager.py` |
-| 8 | [FP8](FP8.md) | ✅ | `nanochat/fp8.py` |
-| 9 | SFT / 对话对齐 | ⏳ | `scripts/chat_sft.py`，`tasks/` |
-| 10 | 强化学习 | ⏳ | `scripts/chat_rl.py` |
-| 11 | 评测 | ⏳ | `scripts/base_eval.py`，`scripts/chat_eval.py`，`nanochat/core_eval.py`，`tasks/` |
-| 12 | 对话入口 | ⏳ | `scripts/chat_cli.py` |
-
-已有四篇按主题写成，尚未按上表重排。目录是目标结构，不是已完成篇幅。
+| **第 2 阶** | **训练流水线 (Training)** | | |
+| 4 | 数据与预训练循环 | ⏳ | `nanochat/dataset.py`，`nanochat/dataloader.py`，`scripts/base_train.py` |
+| 5 | 优化器、常规精度与 checkpoint | ⏳ | `nanochat/optim.py`，`nanochat/common.py`，`nanochat/checkpoint_manager.py` |
+| 6 | [FP8 混合精度训练](FP8.md) | ✅ | `nanochat/fp8.py` |
+| **第 3 阶** | **对齐与评测 (Post-Training)**| | |
+| 7 | SFT / 对话对齐 | ⏳ | `scripts/chat_sft.py`，`tasks/` |
+| 8 | 强化学习 | ⏳ | `scripts/chat_rl.py` |
+| 9 | 评测 | ⏳ | `scripts/base_eval.py`，`scripts/chat_eval.py`，`nanochat/core_eval.py`，`tasks/` |
+| **第 4 阶** | **推理引擎与极致效率 (Inference & Systems)**| | |
+| 10| [KV Cache 与推理引擎](KVCache.md) | ✅ | `nanochat/engine.py`，`nanochat/gpt.py` |
+| 11| [FlashAttention](FlashAttention.md) | 🚧 | `nanochat/flash_attention.py` |
+| 12| 对话入口 | ⏳ | `scripts/chat_cli.py` |
 
 ## 进度
 
