@@ -39,9 +39,6 @@ grad_accum_steps = total_batch_size // world_tokens_per_fwdbwd
 * **`total_batch_size`**：**模型每做一次参数更新（One Optimizer Step）所需要消耗的目标 Token 总量**（业界常称 Global Batch Size）。例如训练 LLaMA 或 GPT-3 时，目标 Global Batch Size 可能是 200 万 或 400 万 tokens。**不是**指全部训练语料的总量。整套语料（Corpus）的总量在代码中对应的是 `total_tokens`。
 * **`num_iterations`**：整个训练任务实际执行的模型参数更新总步数（Optimizer Steps）。每一步代表集群执行完一个完整的 Global Batch 训练并执行一次优化器更新。如果显式配置（例如 `--num-iterations=1`），脚本将直接运行指定步数（非常适合本地或小规模联调）；若未显式配置，脚本通常会依据 Scaling Laws（如 `--target-param-data-ratio` 或 `--target-flops`）自动计算出最优的迭代步数。
 
-### 梯度累积步数
-* **`grad_accum_steps`**：**单次优化器更新之前，每张 GPU 需要连续做多少次前向与反向传播来累加梯度**。**不是**指跑完所有语料需要的总步数。
-
 ### 核心计算关系
 
 大模型训练受限于 GPU 显存，无法直接把几百万 token 的 Global Batch 一次性塞进显卡，因此拆解为：
