@@ -36,7 +36,7 @@
 | 2 | 模型结构 | ⏳ | `nanochat/gpt.py` |
 | 3 | [旋转位置编码 RoPE](RotaryEmbedding.md) | ✅ | `nanochat/gpt.py` |
 | **第 2 阶** | **训练流水线 (Training)** | | |
-| 4 | 数据与预训练循环 | ⏳ | `nanochat/dataset.py`，`nanochat/dataloader.py`，`scripts/base_train.py` |
+| 4 | [预训练参数与训练步数计算](BaseTrainParameter.md) | 🚧 | `scripts/base_train.py` |
 | 5 | 优化器、常规精度与 checkpoint | ⏳ | `nanochat/optim.py`，`nanochat/common.py`，`nanochat/checkpoint_manager.py` |
 | 6 | [FP8 混合精度训练](FP8.md) | ✅ | `nanochat/fp8.py` |
 | **第 3 阶** | **对齐与评测 (Post-Training)**| | |
