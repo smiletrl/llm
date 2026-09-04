@@ -9,14 +9,14 @@ python -m scripts.base_train \
   --device-batch-size=4 \
   --eval-tokens=512 \
   --core-metric-every=-1 \
-  --total-batch-size=2048 \
+  --total-batch-size=4096 \
   --num-iterations=1 \
   --eval-every=-1 
 ```
 
 文件 `scripts/base_train.py` 提供了大量可选的训练参数，比如上例中的 `--depth`, `--max-seq-len`。了解这些参数，方便理解模型训练流程。
 
-*注：在上述单卡测试配置下，单次 `device-batch-size * max-seq-len` (Micro-batch) 的 Token 刚好等于 total-batch-size，此时 grad_accum_steps = 1，不需要做梯度累积直接更新权重。*
+*注：在上述单卡测试配置下，单次 `total-batch-size` 是 `device-batch-size * max-seq-len` (Micro-batch) 的 Token 数量2倍 ，此时 grad_accum_steps = 2，需要做梯度累积两次才能更新权重。*
 
 ## 分布式训练步骤
 
