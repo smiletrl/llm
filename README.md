@@ -1,14 +1,16 @@
 # nanochat-guide
 
-不提供代码。对照 [karpathy/nanochat](https://github.com/karpathy/nanochat)，精读一份最小可行大模型：从分词、预训练、对齐，到推理和对话。
+[karpathy/nanochat](https://github.com/karpathy/nanochat) 用一份可改的小仓库，把分词、预训练、SFT、可选强化学习、评测和带 KV 的推理串成一条能跑通的链路。它不是训练框架，也不是生产推理引擎；它是目前少有的、认知负担足够低的全栈基线。
+
+本仓库对照这份代码精读：每段在全链路的哪一步、为什么这样写。不提供代码副本。
+
+建议有 PyTorch 基础。不要求NLP背景。若对 PyTorch 训练循环还不熟，可先看 [Let's build GPT](https://www.youtube.com/watch?v=kCc8FmEb1nY)。PyTorch 仍吃力的话，可选看一份最小的 [MNIST 训练示例](https://github.com/smiletrl/machine-learning/blob/main/01_nn_from_scratch_mnist/code/pytorch_mnist.py)（不是本仓库内容）。
 
 ## 这不是什么
 
 - 不是 nanochat 的 fork，也不维护一份代码副本
 - 不是从 NLP 讲起的系统课
 - 不是 vLLM / SGLang 生产系统教程
-
-代码只在上游。这里只讲：这段代码在全链路的哪一步、为什么这样写。
 
 ## 怎么读
 
@@ -20,8 +22,6 @@
 
 2. 按下面顺序读。已完成的章节链到正文，未写的只标对应文件。
 3. 读设计即可，不要求 8×H100。
-
-建议有 Transformer 和 PyTorch 基础。
 
 ## 目录
 
