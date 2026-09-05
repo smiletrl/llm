@@ -178,6 +178,7 @@ def generate(self, tokens, num_samples=1, max_tokens=None, temperature=1.0, top_
         )
         ids = torch.tensor([tokens], dtype=torch.long, device=device)
         # 这一步主要是计算提示词的kv_cache。logits的最后一个token的结果会被用来预测推理的第一个token
+        # ids 的形状是 (1, T_prompt)
         logits = self.model.forward(ids, kv_cache=kv_cache_prefill)
         logits = logits[:, -1, :].expand(num_samples, -1)  # (num_samples, vocab_size)
         
@@ -203,7 +204,8 @@ def generate(self, tokens, num_samples=1, max_tokens=None, temperature=1.0, top_
             ids = torch.tensor(token_column, dtype=torch.long, device=device).unsqueeze(1)
 
             # 传入的这个ids token 依赖kv_cache_decode中保存的前面已经推理出来的token的kv cache。
-            # 同时会先把 ids KV 追加到kv_cache_decode中，然后再计算ids的logits。
+            # 同时会先把这个token追加到kv_cache_decode中，然后再计算ids的logits。
+            # ids 的形状是(num_samples, 1)
             logits = self.model.forward(ids, kv_cache=kv_cache_decode)[:, -1, :]  # (B, vocab_size)
 ```
 
